@@ -97,7 +97,8 @@ const Content = () => {
     axios
       .get(apiUrl)
       .then((response) => {
-        console.log(response?.data);
+        console.log("check data");
+        console.log(response?.data?.AllSummary);
         setNoteDetails(response?.data);
       })
       .catch((error) => {
@@ -317,15 +318,28 @@ const Content = () => {
 
   const TotalSummary = async () => {
     setQuiz(false);
-    setCheckSummary(true);
+   setCheckSummary(true);
 
+    if(noteDetails?.AllSummary)
+    {
+      setAllSummary(noteDetails?.AllSummary);
+     }
+    else{
+    genSum();
+   }
+  };
+
+  const genSum = async () =>{
+    setQuiz(false);
+   setCheckSummary(true);
     setLoading(true);
     const TotalSummary = await axios.post(PYTHON_API + "ask_note", {
-      input: "Summarize this in short",
+      input: "Summarize the whole content and give a well structured detail analysis on the topic",
       start_new: true,
       doc_id: id,
     });
-    setAllSummary(TotalSummary?.data);
+    console.log(TotalSummary?.data?.response);
+    setAllSummary(TotalSummary?.data?.response);
     console.log(id);
     try {
       const response = await axios.put(`${MAIN_API}api/v1/notes/${id}`, {
@@ -339,7 +353,7 @@ const Content = () => {
       );
     }
     setLoading(false);
-  };
+  }
 
   return (
     <main>
@@ -605,7 +619,7 @@ const Content = () => {
                   <button
                     type="button"
                     class="w-24 sm:w-28 bg-orange-600 hover:bg-orange-600/90 rounded-md text-center text-xs lg:text-sm text-white font-medium py-2 px-3 flex-shrink-0 disabled:opacity-50 disabled:cursor-wait transition-all duration-300"
-                    onClick={() => {}}
+                    onClick={genSum}
                   >
                     <i class="bi bi-arrow-clockwise"></i>
                   </button>
@@ -659,8 +673,11 @@ const Content = () => {
                 </div>
               ) : (
                 <div class="flex flex-col gap-4 rounded bg-beta/40 p-4 sm:p-8 lg:p-10">
-                  <h1>Total summary</h1>
-                  {AllSummary?.response}
+                  <span class="text-xl sm:text-2xl lg:text-3xl font-semibold">
+                  Total summary
+                </span>
+                  
+                  {AllSummary}
                 </div>
               )
             ) : loading ? (
