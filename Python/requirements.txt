@@ -1,0 +1,17 @@
+bs4
+requests
+pandas
+pymongo
+pypdf
+langchain
+langchain_community
+faiss-cpu
+urllib3
+Flask
+flask-cors
+boto3
+
+
+
+# Optional for GPU support if available
+# faiss-gpu==1.7.2
