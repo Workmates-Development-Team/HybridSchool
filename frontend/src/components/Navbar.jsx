@@ -45,7 +45,7 @@ const Navbar = () => {
 
           <Button className="uppercase tracking-[2px] px-5" size="sm">
             <Link class="nav-link active" aria-current="page" to="/">
-            <i class="bi bi-house-door"></i>
+            <i class="bi bi-house-door"></i> Home
             </Link>
           </Button>
 

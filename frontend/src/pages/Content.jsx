@@ -91,7 +91,6 @@ const Content = () => {
       });
   }, [summaryData]);
 
-
   useEffect(() => {
     const apiUrl = `${MAIN_API}api/v1/notes/${id}`;
 
@@ -113,8 +112,7 @@ const Content = () => {
     setCheckSummary(false);
     console.log("here " + prompt[0]?.summary);
 
-    if(prompt[0]?.summary)
-    {
+    if (prompt[0]?.summary) {
       try {
         const summaryResponses = await Promise.all(
           prompt.map(async (item) => {
@@ -144,7 +142,6 @@ const Content = () => {
       try {
         const rewrittenResponses = await Promise.all(
           prompt.map(async (item) => {
-
             return item?.rewrittenNotes; // Assuming the response data contains the rewritten text
           })
         );
@@ -156,7 +153,6 @@ const Content = () => {
       try {
         const urlrespponse = await Promise.all(
           prompt.map(async (item) => {
-
             return item?.url; // Assuming the response data contains the rewritten text
           })
         );
@@ -164,11 +160,8 @@ const Content = () => {
       } catch (error) {
         console.error("Error posting rewritten data:", error);
       }
-
-    }
-    else{
-
-    analyzeSave(prompt);
+    } else {
+      analyzeSave(prompt);
     }
   };
 
@@ -325,7 +318,7 @@ const Content = () => {
   const TotalSummary = async () => {
     setQuiz(false);
     setCheckSummary(true);
-   
+
     setLoading(true);
     const TotalSummary = await axios.post(PYTHON_API + "ask_note", {
       input: "Summarize this in short",
@@ -335,18 +328,18 @@ const Content = () => {
     setAllSummary(TotalSummary?.data);
     console.log(id);
     try {
-      const response = await axios.put(`${MAIN_API}api/v1/notes/${id}`, { AllSummary : TotalSummary?.data?.response });
-      console.log('Note updated successfully:', response?.data);
-     
+      const response = await axios.put(`${MAIN_API}api/v1/notes/${id}`, {
+        AllSummary: TotalSummary?.data?.response,
+      });
+      console.log("Note updated successfully:", response?.data);
     } catch (error) {
-      console.error('Error updating note:', error.response ? error.response.data : error.message);
-      
+      console.error(
+        "Error updating note:",
+        error.response ? error.response.data : error.message
+      );
     }
     setLoading(false);
-  
   };
-
-  
 
   return (
     <main>
@@ -664,11 +657,12 @@ const Content = () => {
                 <div className="d-flex justify-content-center align-items-center">
                   <Spinner animation="border" />
                 </div>
-              ) : 
-              <div class="flex flex-col gap-4 rounded bg-beta/40 p-4 sm:p-8 lg:p-10">
-                <h1>Total summary</h1>
-                {AllSummary?.response}
-              </div>
+              ) : (
+                <div class="flex flex-col gap-4 rounded bg-beta/40 p-4 sm:p-8 lg:p-10">
+                  <h1>Total summary</h1>
+                  {AllSummary?.response}
+                </div>
+              )
             ) : loading ? (
               <div className="d-flex justify-content-center align-items-center">
                 <Spinner animation="border" />
@@ -680,12 +674,18 @@ const Content = () => {
                 {url[0] && (
                   <>
                     {MAIN_API + "files/" + url[0]}
-                    <video width="640" height="360" controls>
-                      <source
-                        src={MAIN_API + "files/" + url[0]}
-                        type="video/webm"
-                      />
-                    </video>
+                    {url.map((item)=>(
+                      <ReactPlayer
+                      className="react-player"
+                      url={MAIN_API + "files/" + item}
+                      width="40%"
+                      height="40%"
+                      controls={true} // Show player controls
+                    />
+
+                    ))
+                    
+                  }
                   </>
                 )}
                 <div class="font-medium text-xl sm:text-2xl">

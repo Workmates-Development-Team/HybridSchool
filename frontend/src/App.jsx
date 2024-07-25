@@ -15,6 +15,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 import MyNotes from "./pages/MyNotes";
 import QuizComponent from "./components/QuizComponent";
+import RVR from "./components/ReactVideoRecorder";
+import VideoRecorder from "./components/VideoRecorder";
 
 const App = () => {
 
@@ -40,6 +42,9 @@ const App = () => {
         </Route>
         <Route path="/login" element={<Login />} />
           <Route path="/registration" element={<Registration />} />
+
+          <Route path="/rvr" element={<RVR />} />
+          <Route path="/video" element={<VideoRecorder />} />
       </Routes>
     </>
   );

@@ -12,6 +12,9 @@ const HandleVideo = () => {
   const [chunks, setChunks] = useState([]);
   const {id} = useParams();
 
+  const [isRecording, setIsRecording] = useState(false);
+  const chunksRef = useRef([]);
+
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
 
@@ -94,21 +97,54 @@ const HandleVideo = () => {
     return () => clearInterval(timerInterval);
   }, [recording]);
 
-  const startRecording = () => {
-    if (mediaRecorderRef.current) {
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      videoRef.current.srcObject = stream;
+      mediaRecorderRef.current = new MediaRecorder(stream, { mimeType: 'video/webm' });
+ 
+      mediaRecorderRef.current.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          chunksRef.current.push(event.data);
+        }
+      };
+ 
       mediaRecorderRef.current.start();
-      setRecording(true);
+      setIsRecording(true);
+    } catch (error) {
+      console.error('Error accessing media devices.', error);
     }
   };
 
-  const stopRecording = () => {
-    if (mediaRecorderRef.current) {
-      mediaRecorderRef.current.stop();
-      setRecording(false);
-      console.log(transcript);
-      saveVideo();
-    }
+  const stopRecording = async () => {
+    mediaRecorderRef.current.stop();
+    videoRef.current.srcObject.getTracks().forEach(track => track.stop());
+    setIsRecording(false);
+    // Create the video blob from recorded chunks
+    const blob = new Blob(chunksRef.current, { type: 'video/webm' });
+    chunksRef.current = [];
+ 
+   const formData = new FormData()
+   formData.append('file', blob, 'recording.webm');
+   formData.append('rawNotes','ffytfy');
+   formData.append('type', 'video');
+    const id = '668d07f94a886e3ee7fd4d71';
+   try {
+     const response = await fetch(MAIN_API+'api/v1/collections/'+id, {
+       method: 'POST',
+       body: formData,
+     });
+     if (response.ok) {
+       console.log('Video uploaded successfully');
+       alert("file saved successfully");
+     } else {
+       console.error('Video upload failed');
+     }
+   } catch (error) {
+     console.error('Error uploading video: ', error);
+   }
   };
+
 
   const saveVideo = async () => {
     const blob = new Blob(chunks, { type: 'video/webm' });
@@ -143,7 +179,7 @@ const HandleVideo = () => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100vh', position: 'relative' }}>
       <div style={{ marginBottom: '10px', zIndex: 1 }}>
-        {!recording ? (
+        {!isRecording ? (
           <FontAwesomeIcon icon={faPlay} size="2x" onClick={()=>{startRecording(),handleListen()}} />
         ) : (
           <FontAwesomeIcon icon={faStop} size="2x" onClick={()=>{handleListen(),stopRecording()}} />
@@ -151,9 +187,10 @@ const HandleVideo = () => {
       </div>
     
       <div style={{ position: 'relative', width: '50%', height: '50%', zIndex: 0 }}>
-        <video ref={videoRef} style={{ width: '100%', height: '100%' }}></video>
+        {/* <video ref={videoRef} style={{ width: '100%', height: '100%' }}></video> */}
+        <video ref={videoRef} autoPlay playsInline muted style={{ width: '100%', height: '100%'}} />
       </div>
-      {recording && (
+      {isRecording && (
         <div style={{ color: 'red', fontSize: '20px', position: 'relative', top: '10px', zIndex: 2 }}>
           {formatTime(timer)}
         </div>
