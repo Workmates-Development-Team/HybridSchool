@@ -676,8 +676,8 @@ const Content = () => {
                   <span class="text-xl sm:text-2xl lg:text-3xl font-semibold">
                   Total summary
                 </span>
+                  <MarkdownRenderer text={AllSummary} />
                   
-                  {AllSummary}
                 </div>
               )
             ) : loading ? (
