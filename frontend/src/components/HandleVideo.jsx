@@ -126,9 +126,9 @@ const HandleVideo = () => {
  
    const formData = new FormData()
    formData.append('file', blob, 'recording.webm');
-   formData.append('rawNotes','ffytfy');
+   formData.append('rawNotes',transcript);
    formData.append('type', 'video');
-    const id = '668d07f94a886e3ee7fd4d71';
+    
    try {
      const response = await fetch(MAIN_API+'api/v1/collections/'+id, {
        method: 'POST',
@@ -192,7 +192,7 @@ const HandleVideo = () => {
       </div>
       {isRecording && (
         <div style={{ color: 'red', fontSize: '20px', position: 'relative', top: '10px', zIndex: 2 }}>
-          {formatTime(timer)}
+          {/* {formatTime(timer)} */}
         </div>
       )}
       <p> <u>The class Trascript</u> </p>

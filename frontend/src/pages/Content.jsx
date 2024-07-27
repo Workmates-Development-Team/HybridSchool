@@ -24,6 +24,7 @@ import { Modal } from "bootstrap";
 import { Spinner } from "react-bootstrap";
 import MarkdownRenderer from "@/components/MarkdownRenderer";
 import ReactPlayer from "react-player";
+import { Autocomplete, TextField } from "@mui/material";
 
 const Content = () => {
   const [allNotes, setAllNotes] = useState([]);
@@ -50,9 +51,24 @@ const Content = () => {
   const [noteDetails, setNoteDetails] = useState();
   const { user } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
+  const [loading2, setLoading2] = useState(false);
+  const [loading3, setLoading3] = useState(false);
   const [isVideo, setIsVideo] = useState(false);
 
   const { id } = useParams();
+
+  const languageChoice = [
+    { label: "Hindi" },
+    { label: "English" },
+    { label: "Bengali" },
+    { label: "Tamil" },
+    { label: "Odia" },
+    { label: "Kannanda" },
+    { label: "Punjabi" },
+    { label: "Telugu" },
+    { label: "Marathi" },
+    { label: "Malayalam" },
+  ];
 
   const handleOptionChange = (event) => {
     setSelectedOption(event.target.value);
@@ -318,23 +334,22 @@ const Content = () => {
 
   const TotalSummary = async () => {
     setQuiz(false);
-   setCheckSummary(true);
+    setCheckSummary(true);
 
-    if(noteDetails?.AllSummary)
-    {
+    if (noteDetails?.AllSummary) {
       setAllSummary(noteDetails?.AllSummary);
-     }
-    else{
-    genSum();
-   }
+    } else {
+      genSum();
+    }
   };
 
-  const genSum = async () =>{
+  const genSum = async () => {
     setQuiz(false);
-   setCheckSummary(true);
+    setCheckSummary(true);
     setLoading(true);
     const TotalSummary = await axios.post(PYTHON_API + "ask_note", {
-      input: "Summarize the whole content and give a well structured detail analysis on the topic",
+      input:
+        "Summarize the whole content and give a well structured detail analysis on the topic",
       start_new: true,
       doc_id: id,
     });
@@ -353,7 +368,24 @@ const Content = () => {
       );
     }
     setLoading(false);
-  }
+  };
+
+  const handleLanguage = async (event, newevent) => {
+    console.log(newevent.label);
+
+    const translation = await axios.post(PYTHON_API + "ask_note", {
+      input:
+        `Summarize the whole content and give a well structured detail analysis on the topic in ${newevent.label}`,
+      start_new: true,
+      doc_id: id,
+    });
+
+
+    console.log(translation?.data?.response);
+
+
+
+  };
 
   return (
     <main>
@@ -674,10 +706,19 @@ const Content = () => {
               ) : (
                 <div class="flex flex-col gap-4 rounded bg-beta/40 p-4 sm:p-8 lg:p-10">
                   <span class="text-xl sm:text-2xl lg:text-3xl font-semibold">
-                  Total summary
-                </span>
+                    Total summary
+                  </span>
+                  <Autocomplete
+                    disablePortal
+                    id="combo-box-demo"
+                    options={languageChoice}
+                    sx={{ width: 300 }}
+                    onChange={handleLanguage}
+                    renderInput={(params) => (
+                      <TextField {...params} label="Choose Language" />
+                    )}
+                  />
                   <MarkdownRenderer text={AllSummary} />
-                  
                 </div>
               )
             ) : loading ? (
@@ -691,18 +732,15 @@ const Content = () => {
                 {url[0] && (
                   <>
                     {MAIN_API + "files/" + url[0]}
-                    {url.map((item)=>(
+                    {url.map((item) => (
                       <ReactPlayer
-                      className="react-player"
-                      url={MAIN_API + "files/" + item}
-                      width="40%"
-                      height="40%"
-                      controls={true} // Show player controls
-                    />
-
-                    ))
-                    
-                  }
+                        className="react-player"
+                        url={MAIN_API + "files/" + item}
+                        width="40%"
+                        height="40%"
+                        controls={true} // Show player controls
+                      />
+                    ))}
                   </>
                 )}
                 <div class="font-medium text-xl sm:text-2xl">
